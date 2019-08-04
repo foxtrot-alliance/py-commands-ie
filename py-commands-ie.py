@@ -291,8 +291,7 @@ def find_element(ie_obj, find_element_dict, traces):
                         element_obj = [x.contentDocument for x in element_obj]
                     except:
                         element_obj = element_obj.contentDocument
-                        
-    
+
             if not isinstance(element_obj, list):
                 element_obj = [element_obj]
                 
@@ -444,7 +443,6 @@ def execute_command(parameters, ie_obj, element_obj):
     wait = parameters["wait"]
     
     try:
-
         if traces is True:
             print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "=== * Focusing on window and element start * ===")
         
