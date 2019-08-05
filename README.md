@@ -22,3 +22,17 @@ TIP: Make sure NOT to surround the path with quotation marks in your commands.
 ## Commands
 
 <i>More information coming...</i>
+
+<i>Temp examples:</i>
+```
+http://ec.europa.eu/taxation_customs/vies/:
+EXE_PATH -find_element1 "id=countryCombobox" -command "select" -value "DK"
+EXE_PATH -find_element1 "id=number" -command "send" -value "1234556678954645"
+EXE_PATH -find_element1 "id=submit" -command "click"
+EXE_PATH -find_element1 "id=submit" -command "click_bypass"
+
+http://www.nationalbanken.dk/da/statistik/valutakurs/Sider/default.aspx:
+EXE_PATH -find_element1 "id=currenciesTable" -find_element2 "tagname=tr" -command "count"
+EXE_PATH -find_element1 "id=currenciesTable, item=1" -find_element2 "tagname=tr" -find_element3 "tagname=td" -command "get" -attribute "innerText"
+EXE_PATH -find_element1 "id=currenciesTable" -find_element2 "classname=icons-xls" -find_element3 "parent=true" -command "get" -attribute "href"
+```
