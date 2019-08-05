@@ -151,8 +151,6 @@ def validate_project_parameters(parameters):
         command = command.upper()
     elif command.upper() == "LOCATION":
         command = command.upper()
-    elif command.upper() == "WAIT":
-        command = command.upper()
     else:
         return "ERROR: Invalid command parameter! Parameter = " + str(command)
 
@@ -203,6 +201,43 @@ def validate_project_parameters(parameters):
         "wait": wait,
     }
     
+def get_element_location(ie_obj, element_obj, traces):
+    
+    if traces is True:
+        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "\tCalculating element location...")
+
+    ie_obj_position = win32gui.GetWindowRect(ie_obj.hwnd)
+    ie_obj_position_top, ie_obj_position_left, ie_obj_position_bottom, ie_obj_position_right = ie_obj_position[1], ie_obj_position[0], ie_obj_position[3], ie_obj_position[2]
+    
+    ie_obj_position_left = ie_obj_position_left + 7
+    ie_obj_position_bottom = ie_obj_position_bottom - 8
+    ie_obj_position_right = ie_obj_position_right - 8
+    ie_obj_position_top = ie_obj_position_top + ((ie_obj_position_bottom - ie_obj_position_top) - ie_obj.Document.documentElement.clientHeight)
+    
+    if traces is True:
+        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\tINTERNET EXPLORER = Left: {str(ie_obj_position_left)}, Top: {str(ie_obj_position_top)}, Right: {str(ie_obj_position_right)}, Bottom: {str(ie_obj_position_bottom)}")
+
+    element_obj_position = element_obj.getBoundingClientRect()
+    element_obj_position_top, element_obj_position_left, element_obj_position_bottom, element_obj_position_right = element_obj_position.top, element_obj_position.left, element_obj_position.bottom, element_obj_position.right
+    
+    if traces is True:
+        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\tELEMENT = Left: {str(element_obj_position_left)}, Top: {str(element_obj_position_top)}, Right: {str(element_obj_position_right)}, Bottom: {str(element_obj_position_bottom)}")
+    
+    left = ie_obj_position_left + element_obj_position_left
+    top = ie_obj_position_top + element_obj_position_top
+    right = ie_obj_position_left + element_obj_position_right
+    bottom = ie_obj_position_top + element_obj_position_bottom
+    
+    x = left + ((right-left) / 2)
+    y = top + ((bottom-top) / 2)
+    
+    if traces is True:
+        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\tCALCULATED LOCATION = X: {str(x)}, Y: {str(y)}")
+        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "\tLocation calculated!")
+    
+    ie_obj, element_obj = None, None
+    
+    return x, y
     
 def find_window(window, traces):
     
@@ -254,10 +289,7 @@ def find_element(ie_obj, find_element_dict, wait, traces):
     element_obj = ie_obj.Document
 
     try:
-        for loop_x in range(0, len(find_element_dict)):
-            
-            temp_list = find_element_dict[str(loop_x + 1)].split(",")
-    
+        for loop_x in range(0, len(find_element_dict)):    
             id = None
             name = None
             value = None
@@ -269,9 +301,10 @@ def find_element(ie_obj, find_element_dict, wait, traces):
             parent = "False"
             iframe = None
             item = None
+    
+            temp_list = find_element_dict[str(loop_x + 1)].split(",")
 
             for loop_y in range(0, len(temp_list)):
-                
                 if "id=" in str(temp_list[loop_y]).strip():
                     id = str(temp_list[loop_y]).strip()
                     id = id[len("id")+1:]
@@ -337,9 +370,7 @@ def find_element(ie_obj, find_element_dict, wait, traces):
             element_obj_candidates = []
                 
             for element_temp in element_obj:
-                
                 try:
-                    
                     id_applied = False
                     name_applied = False
                     classname_applied = False
@@ -538,6 +569,8 @@ def execute_command(parameters, ie_obj, element_obj):
             return True
             
         for element_obj in element_objs:
+            while ie_obj.Busy:
+                time.sleep(0.05)
             
             if not "GET" in command.upper() and not "COUNT" in command.upper():
                 element_obj.focus()
@@ -548,21 +581,9 @@ def execute_command(parameters, ie_obj, element_obj):
             if command.upper() == "LOCATION":
                 if traces is True:
                     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "=== * Print location start * ===")
-                    
-                print("COMMAND NOT SUPPORTED YET!!!")
-
-                # print(element_obj.offsetLeft)
-                # ie_obj_position = win32gui.GetWindowRect(ie_obj.hwnd)
-                # ie_obj_position_top, ie_obj_position_left, ie_obj_position_bottom, ie_obj_position_right = ie_obj_position[1], ie_obj_position[0], ie_obj_position[3], ie_obj_position[2]
-                # print(ie_obj_position_top, ie_obj_position_left, ie_obj_position_bottom, ie_obj_position_right)
-
-                # element_obj_position = element_obj.getBoundingClientRect()
-                # element_obj_position_top, element_obj_position_left, element_obj_position_bottom, element_obj_position_right = element_obj_position.top, element_obj_position.left, element_obj_position.bottom, element_obj_position.right
-                # print(element_obj_position_top, element_obj_position_left, element_obj_position_bottom, element_obj_position_right)
                 
-                # viewport_obj_position = ie_obj.Document.Body.getBoundingClientRect()
-                # viewport_obj_position_top, viewport_obj_position_left, viewport_obj_position_bottom, viewport_obj_position_right = viewport_obj_position.top, viewport_obj_position.left, viewport_obj_position.bottom, viewport_obj_position.right
-                # print(viewport_obj_position_top, viewport_obj_position_left, viewport_obj_position_bottom, viewport_obj_position_right)
+                x, y = get_element_location(ie_obj, element_obj, traces)
+                print(f"X={x}, Y={y}")
 
                 if traces is True:
                     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "=== * Print location end * ===")
@@ -582,13 +603,13 @@ def execute_command(parameters, ie_obj, element_obj):
                     
                 else:
                     mouse_location_x, mouse_location_y = pyautogui.position()
+                    element_location_x, element_location_y = get_element_location(ie_obj, element_obj, traces)
 
                     if command.upper() == "CLICK":
                         if traces is True:
                             print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "\tAttempting to click...")
                     
-                        print("COMMAND NOT SUPPORTED YET!!!")
-                        # pyautogui.click(position)
+                        pyautogui.click(x=element_location_x, y=element_location_y)
 
                         if traces is True:
                             print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "\tClick complete!")
@@ -597,8 +618,7 @@ def execute_command(parameters, ie_obj, element_obj):
                         if traces is True:
                             print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "\tAttempting to double-click...")
                     
-                        print("COMMAND NOT SUPPORTED YET!!!")
-                        # pyautogui.doubleClick(position)
+                        pyautogui.doubleClick(x=element_location_x, y=element_location_y)
 
                         if traces is True:
                             print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "\tDouble-click complete!")
@@ -607,8 +627,7 @@ def execute_command(parameters, ie_obj, element_obj):
                         if traces is True:
                             print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "\tAttempting to right-click...")
                     
-                        print("COMMAND NOT SUPPORTED YET!!!")
-                        # pyautogui.rightClick(position)
+                        pyautogui.rightClick(x=element_location_x, y=element_location_y)
 
                         if traces is True:
                             print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "\tRight-click complete!")
@@ -621,7 +640,7 @@ def execute_command(parameters, ie_obj, element_obj):
                         if traces is True:
                             print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "\tAttempting to move mouse back to position...")
 
-                        pyautogui.moveTo(mouse_location_x, mouse_location_y)
+                        pyautogui.moveTo(x=mouse_location_x, y=mouse_location_y)
 
                         if traces is True:
                             print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "\tMoving mouse back to position complete!")
