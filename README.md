@@ -2,6 +2,8 @@
 
 <i>Still under initial development...</i>
 
+For support, please contact us: support@foxtrotalliance.com
+
 This program allows you to execute commands in Internet Explorer such as clicking, getting values, setting values, sending values, and more. In some cases, it is not possible to effectively engage with elements on a website in Internet Explorer with the standard targeting technology of Foxtrot. Or, in some cases you simply aim to increase speed or precision. In such scenarios, this program comes in handy as you can create custom logic to perform actions in websites. You can run the program via the CMD or as part of an automation script in an RPA tool like Foxtrot. This solution is meant to supplement Foxtrots core email functionality and enable you to find elements very fast and perform commands not possible using the standard Foxtrot browser technology. The solution is written in Python using the modules "pywin32", "pyautogui", and "keyboard". You can see the [full source code here](https://github.com/foxtrot-alliance/py-commands-ie/blob/master/py-commands-ie.py).
 
 ## Installation
