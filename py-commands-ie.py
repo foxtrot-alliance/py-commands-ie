@@ -689,15 +689,49 @@ def execute_command(parameters, ie_obj, element_obj):
                     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\tAttempting to get the attribute '{attribute}'")
                     
                 if attribute.upper() == "TEXT":
-                    print(str(element_obj.text).strip())
+                    try:
+                        print(str(element_obj.text).strip())
+                    except:
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "\tAs bytes, using unicode...")
+                            
+                        print(element_obj.text.encode('utf-8').strip())
+                        
                 elif attribute.upper() == "VALUE":
-                    print(str(element_obj.value).strip())
+                    try:
+                        print(str(element_obj.value).strip())
+                    except:
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "\tAs bytes, using unicode...")
+                            
+                        print(element_obj.value.encode('utf-8').strip())
+                        
                 elif attribute.upper() == "INNERTEXT":
-                    print(str(element_obj.innerText).strip())
+                    try:
+                        print(str(element_obj.innerText).strip())
+                    except:
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "\tAs bytes, using unicode...")
+                            
+                        print(element_obj.innerText.encode('utf-8').strip())
+                        
                 elif attribute.upper() == "INNERHTML":
-                    print(str(element_obj.innerHtml).strip())
+                    try:
+                        print(str(element_obj.innerHtml).strip())
+                    except:
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "\tAs bytes, using unicode...")
+                            
+                        print(element_obj.innerHtml.encode('utf-8').strip())
+                        
                 else:
-                    print(str(element_obj.getAttribute(attribute)).strip())
+                    try:
+                        print(str(element_obj.getAttribute(attribute)).strip())
+                    except:
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "\tAs bytes, using unicode...")
+                            
+                        print(element_obj.getAttribute(attribute).encode('utf-8').strip())
 
                 if traces is True:
                     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + "\tGetting the attribute complete!")
