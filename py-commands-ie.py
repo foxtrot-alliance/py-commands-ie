@@ -458,7 +458,7 @@ def find_element(ie_obj, find_element_dict, wait, traces):
                             continue
                         
                     if inner_text is not None:
-                        if not inner_text in str(element_obj_candidate.innertext):
+                        if str(element_obj_candidate.innertext) != inner_text:
                             continue
                         
                     if inner_html is not None:
