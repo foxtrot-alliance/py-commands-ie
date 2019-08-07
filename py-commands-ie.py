@@ -299,8 +299,8 @@ def find_element(ie_obj, find_element_dict, wait, traces):
             title = None
             classname = None
             tagname = None
-            inner_text = None
-            inner_html = None
+            innertext = None
+            innerhtml = None
             parent = "False"
             iframe = None
             item = None
@@ -608,12 +608,12 @@ def find_element(ie_obj, find_element_dict, wait, traces):
                         if str(element_obj_candidate.tagname).upper() != tagname.upper():
                             continue
                         
-                    if inner_text is not None:
-                        if str(element_obj_candidate.innertext) != inner_text:
+                    if innertext is not None:
+                        if str(element_obj_candidate.innertext) != innertext:
                             continue
                         
-                    if inner_html is not None:
-                        if str(element_obj_candidate.innerhtml) != inner_html:
+                    if innerhtml is not None:
+                        if str(element_obj_candidate.innerhtml) != innerhtml:
                             continue
                         
                 except:
