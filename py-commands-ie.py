@@ -289,7 +289,10 @@ def find_element(ie_obj, find_element_dict, wait, traces):
     element_obj = ie_obj.Document
 
     try:
-        for loop_x in range(0, len(find_element_dict)):    
+        for loop_x in range(0, len(find_element_dict)):
+            if traces is True:
+                print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\tLocating element {loop_x + 1}...")
+                
             id = None
             name = None
             value = None
@@ -303,6 +306,9 @@ def find_element(ie_obj, find_element_dict, wait, traces):
             item = None
     
             temp_list = find_element_dict[str(loop_x + 1)].split(",")
+                    
+            if traces is True:
+                print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\tParameters = {temp_list}")
 
             for loop_y in range(0, len(temp_list)):
                 if "id=" in str(temp_list[loop_y]).strip():
@@ -348,28 +354,42 @@ def find_element(ie_obj, find_element_dict, wait, traces):
                 elif "item=" in str(temp_list[loop_y]).strip():
                     item = str(temp_list[loop_y]).strip()
                     item = item[len("item")+1:]
+            
+            if loop_x == 0 and iframe is not None:
+                if traces is True:
+                    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\tAttempting to connect to iframe...")
                     
-            if loop_x == 0:
-                if iframe is not None:
+                if isinstance(element_obj, list):
+                    element_obj = element_obj[0]
+                
+                try:
+                    element_obj = element_obj.getElementById(iframe)
+                except:
+                    try:
+                        element_obj = element_obj.body.getElementById(iframe)
+                    except:
+                        element_obj = element_obj.all.item(iframe)
+                
+                try:
+                    element_obj = [x.contentDocument for x in element_obj]
+                except:
                     if isinstance(element_obj, list):
                         element_obj = element_obj[0]
+                        
+                    element_obj = element_obj.contentDocument
                     
-                    element_obj = element_obj.all.item(iframe)
-                    
-                    try:
-                        element_obj = [x.contentDocument for x in element_obj]
-                    except:
-                        if isinstance(element_obj, list):
-                            element_obj = element_obj[0]
-                            
-                        element_obj = element_obj.contentDocument
+                if traces is True:
+                    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\tConnected to iframe!")
 
             if not isinstance(element_obj, list):
                 element_obj = [element_obj]
                 
             element_obj_candidates = []
                 
-            for element_temp in element_obj:
+            for element_index, element_temp in enumerate(element_obj):
+                if traces is True:
+                    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\tLocating subelement {element_index + 1}...")
+                    
                 try:
                     id_applied = False
                     name_applied = False
@@ -377,59 +397,190 @@ def find_element(ie_obj, find_element_dict, wait, traces):
                     tagname_applied = False
                     
                     if parent.upper() == "TRUE":
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\tDetecting parent element...")
+                            
                         elements_temp = element_temp.parentElement
+                        
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\tParent element detected!")
                     
                     elif id is not None:
-                        elements_temp = element_temp.all.item(id)
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\tMatching on ID...")
+                            
+                        try:
+                            elements_temp = element_temp.getElementById(id)
+                            
+                            if traces is True:
+                                print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\t\tSuccesfully using '.getElementById(id)'!")
+                                
+                        except:
+                            try:
+                                elements_temp = element_temp.body.getElementById(id)
+                            
+                                if traces is True:
+                                    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\t\tSuccesfully using '.body.getElementById(id)'!")
+                                    
+                            except:
+                                elements_temp = element_temp.all.item(id)
+                            
+                                if traces is True:
+                                    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\t\tSuccesfully using '.all.item(id)'!")
+                            
                         id_applied = True
                         
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\tMatched on ID!")
+                        
                     elif name is not None:
-                        elements_temp = element_temp.all.item(name)
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\tMatching on name...")
+                            
+                        try:
+                            elements_temp = element_temp.getElementsByName(name)
+                            
+                            if traces is True:
+                                print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\t\tSuccesfully using '.getElementsByName(name)'!")
+                                
+                        except:
+                            try:
+                                elements_temp = element_temp.body.getElementsByName(name)
+                            
+                                if traces is True:
+                                    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\t\tSuccesfully using '.body.getElementsByName(name)'!")
+                                    
+                            except:
+                                elements_temp = element_temp.all.item(name)
+                            
+                                if traces is True:
+                                    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\t\tSuccesfully using '.all.item(name)'!")
+                                
                         name_applied = True
+                        
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\tMatched on name!")
                     
                     elif classname is not None:
-                        elements_temp = element_temp.getElementsByClassName(classname)
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\tMatching on classname...")
+                            
+                        try:
+                            elements_temp = element_temp.getElementsByClassName(classname)
+                            
+                            if traces is True:
+                                print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\t\tSuccesfully using '.getElementsByClassName(classname)'!")
+                                
+                        except:
+                            elements_temp = element_temp.body.getElementsByClassName(classname)
+                            
+                            if traces is True:
+                                print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\t\tSuccesfully using '.body.getElementsByClassName(classname)'!")
+                            
                         classname_applied = True
                         
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\tMatched on classname!")
+                        
                     elif tagname is not None:
-                        elements_temp = element_temp.getElementsByTagName(tagname)
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\tMatching on tagname...")
+                            
+                        try:
+                            elements_temp = element_temp.getElementsByTagName(tagname)
+                            
+                            if traces is True:
+                                print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\t\tSuccesfully using '.getElementsByTagName(tagname)'!")
+                                
+                        except:
+                            try:
+                                elements_temp = element_temp.body.getElementsByTagName(tagname)
+                            
+                                if traces is True:
+                                    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\t\tSuccesfully using '.body.getElementsByTagName(tagname)'!")
+                                    
+                            except:
+                                elements_temp = element_temp.all.tags(tagname)
+                            
+                                if traces is True:
+                                    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\t\tSuccesfully using '.all.tags(tagname)'!")
+                                
                         tagname_applied = True
                         
-                    else:    
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\tMatched on tagname!")
+                        
+                    else:
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\tMatching all...")
+                            
                         elements_temp = element_temp.all
                         
+                        if traces is True:
+                            print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\tMatched all!")
+                        
                 except:
+                    if traces is True:
+                        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\tAttempt to match failed, matching all instead...")
+                    
                     elements_temp = element_temp.all
+                        
+                    if traces is True:
+                        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\tMatched all!")
                 
                 try:
                     element_obj_candidates = element_obj_candidates + [x for x in elements_temp]
                     
+                    if traces is True:
+                        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\tValidating matches...")
+                    
                     if id is not None and id_applied is True:
                         if [x.id for x in elements_temp][0] != id:
+                            if traces is True:
+                                print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\t\tMatches invalid, reversing to all!")
+                                
                             elements_temp = element_temp.all
                             element_obj_candidates = element_obj_candidates + [x for x in elements_temp]
                     
                     if name is not None and name_applied is True:
                         if [x.name for x in elements_temp][0] != name:
+                            if traces is True:
+                                print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\t\tMatches invalid, reversing to all!")
+                                
                             elements_temp = element_temp.all
                             element_obj_candidates = element_obj_candidates + [x for x in elements_temp]
                     
                     if classname is not None and classname_applied is True:
                         if [x.classname for x in elements_temp][0] != classname:
+                            if traces is True:
+                                print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\t\tMatches invalid, reversing to all!")
+                                
                             elements_temp = element_temp.all
                             element_obj_candidates = element_obj_candidates + [x for x in elements_temp]
                     
                     if tagname is not None and tagname_applied is True:
                         if [x.tagname for x in elements_temp][0] != tagname.upper():
+                            if traces is True:
+                                print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\t\tMatches invalid, reversing to all!")
+                                
                             elements_temp = element_temp.all
                             element_obj_candidates = element_obj_candidates + [x for x in elements_temp]
                     
-                except:
+                    if traces is True:
+                        print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\t\tMatches validated!")
+                    
+                except:                            
                     if not isinstance(elements_temp, list):
                         elements_temp = [elements_temp]
                     element_obj_candidates = element_obj_candidates + elements_temp
                     
+                if traces is True:
+                    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\tSubelement {element_index + 1} handled!")
+                    
             element_obj_matches = []
+                    
+            if traces is True:
+                print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\tChecking all {len(element_obj_candidates)} subelement candidates...")
                     
             for element_obj_candidate in element_obj_candidates:
                 try:
@@ -469,12 +620,18 @@ def find_element(ie_obj, find_element_dict, wait, traces):
                     continue
                 
                 element_obj_matches.append(element_obj_candidate)
+                    
+            if traces is True:
+                print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\t\tAll {len(element_obj_candidates)} subelement candidates checked, {len(element_obj_matches)} OK!")
                 
             if item is not None:
                 item = int(item)
                 element_obj_matches = [element_obj_matches[item-1]]
                 
             element_obj = element_obj_matches
+            
+            if traces is True:
+                print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ": " + f"\tElement {loop_x + 1} located!")
             
     except:
         element_obj = []
