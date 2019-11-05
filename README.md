@@ -1,6 +1,6 @@
 # py-commands-ie
 
-<i>Still under initial development...</i>
+<i>Better documentation underway...</i>
 
 For support, please contact us: support@foxtrotalliance.com
 
